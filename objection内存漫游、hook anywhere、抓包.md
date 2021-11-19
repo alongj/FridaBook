@@ -53,7 +53,7 @@ android hooking search classes *** 筛选指定类
 
 ```bash
 android hooking list class_methods sun.util.locale.LanguageTag 打印方法体
-android hooking watch class_method com.xxx.xxx --dump-args --dump-return 快速hook（来看是否代码走到这里）
+android hooking watch class_method com.xxx.xxx --dump-args --dump-backtrace --dump-return 快速hook（来看是否代码走到这里）
 ```
 
 eg: 抖音hook实例
@@ -94,6 +94,20 @@ android hooking watch class_method com.ss.android.ugc.aweme.im.sdk.share.helper.
 (agent) [791094] Return Value: true
 ```
 
+* 附加模式hook
+
+  ```bash
+  objection -g packageName explore --startup-command "android hooking watch com.xxx.xxx"
+  ```
+
+* 设置返回值
+
+  ```bash
+  android hooking set return_value com.xxx.xxx.methodName false
+  ```
+
+  
+
 8. 提取内存信息
 
    1. 查看库的导出函数
@@ -118,14 +132,92 @@ android hooking watch class_method com.ss.android.ugc.aweme.im.sdk.share.helper.
 
       ```bash
       android hooking list activities
-      android heap search instance com.xxx.MainActvitiy
+      android heap search instances com.ss.android.ugc.aweme.main.MainActivity
       ```
 
-      
+      ```bash
+      Class instance enumeration complete for com.ss.android.ugc.aweme.main.MainActivity
+       Hashcode  Class                                       toString()
+      ---------  ------------------------------------------  --------------------------------------------------
+      194448101  com.ss.android.ugc.aweme.main.MainActivity  com.ss.android.ugc.aweme.main.MainActivity@b970ae5
+      ```
 
-   
+   5. 调用实例方法
 
+      ```bash
+      android heap execute 194448101 finish
+      ```
+
+      ```bash
+      Handle 194448101 is to class
+              com.ss.android.ugc.aweme.main.MainActivity
+      Executing method: finish()
+      ```
+
+      编辑调用方法时的js
+
+      ```bash
+      android heap evaluate 120061934
+      ```
+
+      进入编辑模式，输入完成 ESC+Enter
+
+      ```js
+      (The hashcode at `120061934` will be available as the `clazz` variable.)
+      console.log("evaluate result" + clazz.getBasePackageName());
+      JavaScript capture complete. Evaluating...
+      Handle 120061934 is to class
+              com.ss.android.ugc.aweme.main.MainActivity
+      evaluate resultcom.ss.android.ugc.aweme
+      ```
+
+9. 启动Activity和Service
+
+   ```bash
+   直接启动activity
+   android intent launch_activity 强制启动界面，可配合android hooking list activities 获取界面
    
+   直接启动service
+   android hooking list services 查看当前开启的服务
+   android intent launch_service com.服务  开启服务
+   ```
+
+10. Java内存查找
+
+    ```bash
+    列出内存所有的类
+    android hooking list classes (打印所有 classes)
+    搜索类
+    android hooking search classes display
+    搜索所有的方法
+    android hooking search methods display
+    列出类的所有方法
+    android hooking list class_methods com.xxx.xxx
+    ```
+
+11. 查看当前hook工作列表
+
+    ```bash
+    jobs list
+    ```
+
+12. 屏蔽SSL 校验, 使得ssl pinning失效
+
+    ```bash
+    android sslpinning disable
+    ```
+
+    
+
+
+
+
+
+
+
+
+
+
 
 
 
